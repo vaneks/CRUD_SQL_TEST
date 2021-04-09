@@ -67,7 +67,43 @@ public class TeamService extends Util implements TeamRepository {
 
     @Override
     public Team getById(Long id) throws SQLException {
-        return null;
+        Team team = new Team();
+        PreparedStatement preparedStatement = null;
+        try{
+            String sql = "SELECT * FROM teams WHERE id = ?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setLong(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                List<Developer> developers = new ArrayList<>();
+                team.setId(resultSet.getLong("id"));
+                team.setName(resultSet.getString("name"));
+                TeamStatus teamStatus = TeamStatus.valueOf(resultSet.getString("status"));
+                team.setTeamStatus(teamStatus);
+                String sql_ = "SELECT * FROM developers WHERE id IN " +
+                        "(SELECT dev_id FROM team_dev WHERE dev_id = " + resultSet.getLong("id") + ")";
+                preparedStatement = connection.prepareStatement(sql_);
+                ResultSet resultSetDevSkills = preparedStatement.executeQuery(sql_);
+                while (resultSetDevSkills.next()) {
+                    Developer developer = new Developer();
+                    developer.setId(resultSetDevSkills.getLong("id"));
+                    developer.setFirstName(resultSetDevSkills.getString("firstName"));
+                    developer.setLastName(resultSetDevSkills.getString("lastName"));
+                    developers.add(developer);
+                }
+                team.setDevelopers(developers);;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
+        }
+        return team;
     }
 
     @Override
