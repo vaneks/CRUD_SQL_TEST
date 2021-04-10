@@ -10,10 +10,9 @@ import java.util.List;
 
 public class SkillService extends Util implements SkillRepository {
 
-    Connection connection = getConnection();
-
     @Override
     public List<Skill> getAll() throws SQLException {
+        Connection connection = getConnection();
         List<Skill> skills = new ArrayList<>();
         String sql = "SELECT * FROM skills";
         Statement statement = null;
@@ -41,6 +40,7 @@ public class SkillService extends Util implements SkillRepository {
 
     @Override
     public Skill getById(Long id) throws SQLException {
+        Connection connection = getConnection();
         PreparedStatement preparedStatement = null;
         String sql = "SELECT * FROM skills WHERE id = ?";
         Skill skill = new Skill();
@@ -66,6 +66,7 @@ public class SkillService extends Util implements SkillRepository {
 
     @Override
     public Skill save(Skill skill) throws SQLException {
+        Connection connection = getConnection();
         PreparedStatement preparedStatement = null;
         String sql = "INSERT INTO skills (skillName) VALUES (?)";
         try {
@@ -87,6 +88,7 @@ public class SkillService extends Util implements SkillRepository {
 
     @Override
     public Skill update(Skill skill) throws SQLException {
+        Connection connection = getConnection();
         PreparedStatement preparedStatement = null;
         String sql = "UPDATE skills SET skillName = ? WHERE id = ?";
         try {
@@ -109,6 +111,7 @@ public class SkillService extends Util implements SkillRepository {
 
     @Override
     public void deleteById(Long id) throws SQLException {
+        Connection connection = getConnection();
         PreparedStatement preparedStatement = null;
         String sql = "DELETE FROM skills WHERE id = ?";
         try {

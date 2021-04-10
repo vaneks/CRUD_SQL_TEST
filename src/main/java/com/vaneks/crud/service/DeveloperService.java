@@ -9,11 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DeveloperService extends Util implements DeveloperRepository {
-    Connection connection = getConnection();
+
 
     @Override
     public List<Developer> getAll() throws SQLException {
-
+        Connection connection = getConnection();
         List<Developer> developers = new ArrayList<>();
         PreparedStatement preparedStatement = null;
         try{
@@ -54,6 +54,7 @@ public class DeveloperService extends Util implements DeveloperRepository {
 
     @Override
     public Developer getById(Long id) throws SQLException {
+        Connection connection = getConnection();
         PreparedStatement preparedStatement = null;
         Developer developer = new Developer();
         try {
@@ -93,6 +94,7 @@ public class DeveloperService extends Util implements DeveloperRepository {
 
     @Override
     public Developer save(Developer developer) throws  SQLException {
+        Connection connection = getConnection();
         PreparedStatement preparedStatement = null;
 
         try {
@@ -133,6 +135,7 @@ public class DeveloperService extends Util implements DeveloperRepository {
 
     @Override
     public Developer update(Developer developer) throws SQLException {
+        Connection connection = getConnection();
         PreparedStatement preparedStatement = null;
 
         try {
@@ -173,6 +176,7 @@ public class DeveloperService extends Util implements DeveloperRepository {
 
     @Override
     public void deleteById(Long id) throws  SQLException {
+        Connection connection = getConnection();
         PreparedStatement preparedStatement = null;
 
         try {

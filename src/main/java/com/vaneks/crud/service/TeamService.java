@@ -15,10 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TeamService extends Util implements TeamRepository {
-    Connection connection = getConnection();
+
 
     @Override
     public void deleteAll() throws  SQLException {
+        Connection connection = getConnection();
         PreparedStatement preparedStatement = null;
 
         try {
@@ -40,6 +41,7 @@ public class TeamService extends Util implements TeamRepository {
 
     @Override
     public List<Team> getAll() throws SQLException {
+        Connection connection = getConnection();
         List<Team> teams = new ArrayList<>();
         PreparedStatement preparedStatement = null;
         try{
@@ -82,6 +84,7 @@ public class TeamService extends Util implements TeamRepository {
 
     @Override
     public Team getById(Long id) throws SQLException {
+        Connection connection = getConnection();
         Team team = new Team();
         PreparedStatement preparedStatement = null;
         try{
@@ -123,6 +126,7 @@ public class TeamService extends Util implements TeamRepository {
 
     @Override
     public Team save(Team team) throws SQLException {
+        Connection connection = getConnection();
         PreparedStatement preparedStatement = null;
 
         try {
@@ -165,22 +169,21 @@ public class TeamService extends Util implements TeamRepository {
 
     @Override
     public Team update(Team team) throws  SQLException {
+        Connection connection = getConnection();
         PreparedStatement preparedStatement = null;
         try {
             connection.setAutoCommit(false);
-
-            String sql = "UPDATE team SET status = 'UNDER_REVIEW' WHERE id=?";
+            String sql = "UPDATE teams SET status = 'UNDER_REVIEW' WHERE id=?";
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setLong(1 , team.getId());
             preparedStatement.executeUpdate();
-
             sql = "DELETE FROM team_dev  WHERE team_id = ?";
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setLong(1 , team.getId());
             preparedStatement.executeUpdate();
 
             for(Developer developer : team.getDevelopers()) {
-                sql = "INSERT INTO team_dev (team_id, dev_id) VALUES (?,?)?";
+                sql = "INSERT INTO team_dev (team_id, dev_id) VALUES (?,?)";
                 preparedStatement = connection.prepareStatement(sql);
                 preparedStatement.setLong(1 , team.getId());
                 preparedStatement.setLong(2 , developer.getId());
@@ -204,6 +207,7 @@ public class TeamService extends Util implements TeamRepository {
 
     @Override
     public void deleteById(Long id) throws IOException, SQLException {
+        Connection connection = getConnection();
         PreparedStatement preparedStatement = null;
 
         try {
