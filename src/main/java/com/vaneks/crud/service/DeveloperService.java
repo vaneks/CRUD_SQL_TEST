@@ -152,7 +152,6 @@ public class DeveloperService extends Util implements DeveloperRepository {
 
             for(Skill skill : developer.getSkills()) {
                 sql = "INSERT INTO dev_skills (dev_id, skill_id) VALUES (?, ?)";
-                System.out.println(skill.getId());
                 preparedStatement = connection.prepareStatement(sql);
                 preparedStatement.setLong(1 , developer.getId());
                 preparedStatement.setLong(2 , skill.getId());
@@ -179,15 +178,9 @@ public class DeveloperService extends Util implements DeveloperRepository {
         try {
             String sql = "DELETE FROM developers WHERE id = ?";
             preparedStatement = connection.prepareStatement(sql);
-            connection.setAutoCommit(false);
             preparedStatement.setLong(1, id);
             preparedStatement.executeUpdate();
 
-            sql = "DELETE FROM dev_skills  WHERE dev_id = ?";
-            preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setLong(1 , id);
-            preparedStatement.executeUpdate();
-            connection.commit();
 
         } catch (SQLException e) {
             e.printStackTrace();

@@ -44,7 +44,7 @@ public class TeamController {
     public void controllerDeleteAll() {
         try {
             controllerTeam.deleteAll();
-        } catch (IOException e) {
+        } catch (IOException | SQLException e) {
             e.printStackTrace();
         }
     }

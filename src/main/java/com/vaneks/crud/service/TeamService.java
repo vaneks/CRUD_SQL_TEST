@@ -2,7 +2,6 @@ package com.vaneks.crud.service;
 
 import com.vaneks.crud.db.Util;
 import com.vaneks.crud.model.Developer;
-import com.vaneks.crud.model.Skill;
 import com.vaneks.crud.model.Team;
 import com.vaneks.crud.model.TeamStatus;
 import com.vaneks.crud.repository.TeamRepository;
@@ -19,8 +18,24 @@ public class TeamService extends Util implements TeamRepository {
     Connection connection = getConnection();
 
     @Override
-    public void deleteAll() throws IOException {
+    public void deleteAll() throws  SQLException {
+        PreparedStatement preparedStatement = null;
 
+        try {
+            String sql = "DELETE FROM teams WHERE status = 'DELETED'";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if( preparedStatement != null) {
+                preparedStatement.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
+        }
     }
 
     @Override
@@ -39,14 +54,14 @@ public class TeamService extends Util implements TeamRepository {
                 TeamStatus teamStatus = TeamStatus.valueOf(resultSet.getString("status"));
                 team.setTeamStatus(teamStatus);
                 String sql_ = "SELECT * FROM developers WHERE id IN " +
-                        "(SELECT dev_id FROM team_dev WHERE dev_id = " + resultSet.getLong("id") + ")";
+                        "(SELECT dev_id FROM team_dev WHERE team_id = " + resultSet.getLong("id") + ")";
                 preparedStatement = connection.prepareStatement(sql_);
-                ResultSet resultSetDevSkills = preparedStatement.executeQuery(sql_);
-                while (resultSetDevSkills.next()) {
+                ResultSet resultSetTeamDev = preparedStatement.executeQuery(sql_);
+                while (resultSetTeamDev.next()) {
                     Developer developer = new Developer();
-                    developer.setId(resultSetDevSkills.getLong("id"));
-                    developer.setFirstName(resultSetDevSkills.getString("firstName"));
-                    developer.setLastName(resultSetDevSkills.getString("lastName"));
+                    developer.setId(resultSetTeamDev.getLong("id"));
+                    developer.setFirstName(resultSetTeamDev.getString("firstName"));
+                    developer.setLastName(resultSetTeamDev.getString("lastName"));
                     developers.add(developer);
                 }
                 team.setDevelopers(developers);
@@ -81,17 +96,17 @@ public class TeamService extends Util implements TeamRepository {
                 TeamStatus teamStatus = TeamStatus.valueOf(resultSet.getString("status"));
                 team.setTeamStatus(teamStatus);
                 String sql_ = "SELECT * FROM developers WHERE id IN " +
-                        "(SELECT dev_id FROM team_dev WHERE dev_id = " + resultSet.getLong("id") + ")";
+                        "(SELECT dev_id FROM team_dev WHERE team_id = " + resultSet.getLong("id") + ")";
                 preparedStatement = connection.prepareStatement(sql_);
-                ResultSet resultSetDevSkills = preparedStatement.executeQuery(sql_);
-                while (resultSetDevSkills.next()) {
+                ResultSet resultSetTeamDev = preparedStatement.executeQuery(sql_);
+                while (resultSetTeamDev.next()) {
                     Developer developer = new Developer();
-                    developer.setId(resultSetDevSkills.getLong("id"));
-                    developer.setFirstName(resultSetDevSkills.getString("firstName"));
-                    developer.setLastName(resultSetDevSkills.getString("lastName"));
+                    developer.setId(resultSetTeamDev.getLong("id"));
+                    developer.setFirstName(resultSetTeamDev.getString("firstName"));
+                    developer.setLastName(resultSetTeamDev.getString("lastName"));
                     developers.add(developer);
                 }
-                team.setDevelopers(developers);;
+                team.setDevelopers(developers);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -109,6 +124,7 @@ public class TeamService extends Util implements TeamRepository {
     @Override
     public Team save(Team team) throws SQLException {
         PreparedStatement preparedStatement = null;
+
         try {
             connection.setAutoCommit(false);
 
@@ -121,6 +137,7 @@ public class TeamService extends Util implements TeamRepository {
             String lastIdSql = "SELECT last_insert_id() FROM teams";
             ResultSet resultSet = preparedStatement.executeQuery(lastIdSql);
             resultSet.next();
+            team.setId((long) resultSet.getInt("last_insert_id()"));
 
             for(Developer developer : team.getDevelopers()) {
                 sql = "INSERT INTO team_dev (team_id, dev_id) VALUES (?, ?)";
@@ -147,12 +164,64 @@ public class TeamService extends Util implements TeamRepository {
 
 
     @Override
-    public Team update(Team team) throws IOException, SQLException {
-        return null;
+    public Team update(Team team) throws  SQLException {
+        PreparedStatement preparedStatement = null;
+        try {
+            connection.setAutoCommit(false);
+
+            String sql = "UPDATE team SET status = 'UNDER_REVIEW' WHERE id=?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setLong(1 , team.getId());
+            preparedStatement.executeUpdate();
+
+            sql = "DELETE FROM team_dev  WHERE team_id = ?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setLong(1 , team.getId());
+            preparedStatement.executeUpdate();
+
+            for(Developer developer : team.getDevelopers()) {
+                sql = "INSERT INTO team_dev (team_id, dev_id) VALUES (?,?)?";
+                preparedStatement = connection.prepareStatement(sql);
+                preparedStatement.setLong(1 , team.getId());
+                preparedStatement.setLong(2 , developer.getId());
+                preparedStatement.executeUpdate();
+            }
+
+            connection.commit();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if( preparedStatement != null) {
+                preparedStatement.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
+        }
+        return team;
     }
 
     @Override
     public void deleteById(Long id) throws IOException, SQLException {
+        PreparedStatement preparedStatement = null;
 
+        try {
+            String sql = "UPDATE teams SET status='DELETED' WHERE id = ?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setLong(1 , id);
+            preparedStatement.executeUpdate();
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if( preparedStatement != null) {
+                preparedStatement.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
+        }
     }
 }
