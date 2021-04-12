@@ -1,6 +1,7 @@
 package com.vaneks.crud.model;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Team {
     private Long id;
@@ -50,5 +51,21 @@ public class Team {
 
     public void setDevelopers(List<Developer> developers) {
         this.developers = developers;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Team team = (Team) o;
+        return id.equals(team.id) &&
+                name.equals(team.name) &&
+                developers.equals(team.developers) &&
+                teamStatus == team.teamStatus;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, developers, teamStatus);
     }
 }
