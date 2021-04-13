@@ -8,8 +8,8 @@ public class Util {
 
     static final String DATABASE_URL = "jdbc:mysql://localhost/crud";
     static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-    static final String USER = "root";
-    static final String PASSWORD = "22272627q!";
+    static final String USER = "";
+    static final String PASSWORD = "";
 
     public Connection getConnection() {
         Connection connection = null;
