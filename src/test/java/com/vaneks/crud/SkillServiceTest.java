@@ -9,13 +9,11 @@ import org.junit.Test;
 import static org.mockito.Mockito.*;
 
 public class SkillServiceTest {
-    SkillRepository skillRepository = mock(SkillRepository.class);
-    SkillService serviceUnderTest = new SkillServiceImpl();
+    SkillService skillRepository = mock(SkillService.class);
 
     @Test
     public void getByIdTest() {
-        when(serviceUnderTest.getById((long) 1)).thenReturn(new Skill(1L, "Java"));
-        serviceUnderTest.getById(1L);
+        skillRepository.getById(1L);
         verify(skillRepository, times(1)).getById(1L);
     }
 }
